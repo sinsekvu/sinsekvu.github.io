@@ -1,0 +1,60 @@
+Contact
+-------
+
+Email
+=====
+
+The only reliable way to contact me is email: KAction@gnu.org. Note,
+that I process email at most once every 24 hours, so do not expect
+instant reply.
+
+When you send email to me, use GPG encryption. If you do not
+know how, take a look at `email self-defence guide
+<https://emailselfdefense.fsf.org/en/>`__. Here is my key, which you
+should use to encrypt email, which you send to me:
+
+.. code::
+
+    sec   4096R/788BE01254B7F00D 2012-11-02 [expires: 2018-08-11]
+          Key fingerprint = D1E0 591E 0037 BDCC BEE5  6002 788B E012 54B7 F00D
+    uid                          Dmitry Bogatov <KAction@gnu.org>
+    ssb   4096R/3922EF7BAF254F39 2012-11-02
+
+It is available on key servers
+
+.. code:: sh
+
+    $ gpg --recv-keys D1E0591E0037BDCCBEE56002788BE01254B7F00D
+
+or can be downloaded from this website in `armored
+form <../_static/kaction.gpg.txt>`__ and imported in command line:
+
+.. code:: sh
+
+    $ gpg --import kaction.gpg.txt
+
+IRC
+===
+
+Very rarely I appear on ``irc.debian.org`` as ``kaction-guest``, and
+even more rarely I appear as ``kaction`` on ``irc.freenode.net``, since
+I am banned from it for being Tor exit node.
+
+SSH
+===
+
+If you for some reason want to grant me remote access to your machine,
+add following line (`raw version <../_static/ssh.txt>`__) into your
+``~/.ssh/authorized_keys``:
+
+.. code::
+
+
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDCJJaew6bctSSjZNo23j68qI5alfrdtIx4MZmjvhGaumhN7q6sZiLxjwRAV5kxivcI+1TpC9r9SN4EzL1E8j6vIZ6PWRfahq+CEp16ZiZc9lAzi2VAEn/4FJXm4H/06SBjfU0uJ35YtEik/SpqxkpkM8ns51RbBMvBYPgceuzVRn3raoC7ESEtc93OaQYXy5XLT/u/QwRrvXs3XlXQbKfedS6v9H5YSKpmXa3RU3O9SNAY3E5evQu+qjp90zHFIpnMEbbSEs3NVWUO332K97GHIPqSi1vdTQLx//b5pUBXuOYDiYXj3FiW98ps7jaV5D3+h1yN3+whrByajlVgp/YR /home/kaction/.ssh/id_rsa
+
+Phone
+=====
+
+If everything else fails, you can call at ``+7 925 739 00
+02``. Surely, it is unreliable, costly and rude method of contacting a
+person.

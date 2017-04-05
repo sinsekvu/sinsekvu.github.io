@@ -1,0 +1,146 @@
+Speeding up apt-file
+====================
+
+.. author:: default
+.. categories:: none
+.. tags:: none
+.. comments::
+
+
+Almost every GNU/Linux distribution provide means to tell what package
+does given file in your file system belong to. Debian based distribution
+allow you to tell what package you have to install in order to get given
+file in your file system.
+
+You may want it, if
+
+-  you are compiling from source some software, and build fails due
+   missing headers or libraries. For example, what package provides
+   ``X11/keysym.h``?
+
+-  you saw some article on web, that mentions some command, and you have
+   no idea where does it comes from. Did you knew, for example, that
+   program ``xxd``, which converts file into declaration of C byte array
+   of same content, is part of vim?
+
+-  you was told to ``use HTML::LinkExtractor`` perl module and you are
+   interested where to get it. (No, ad-hoc installs via ``cpan`` are not
+   good enough)
+
+To do all above and more, you can use ``apt-file`` program. With
+``apt-file`` you do not need search web or ask people on IRC:
+
+::
+
+    $ apt-file find stupid-header.h
+    $ apt-file find /bin/xxd
+
+and you are done. Actually, you can use power of perl regular
+expressions to search for files. But this power comes at price.
+
+And what the problem?
+---------------------
+
+``apt-file`` is very slow:
+
+.. code:: sh
+
+    $ apt-file find /bin/xxd
+    vim-common: /usr/bin/xxd
+    vim-dbg: /usr/lib/debug/usr/bin/xxd
+    xxd: /usr/bin/xxd
+    xxdiff: /usr/bin/xxdiff
+    12.34user 0.55system 0:10.19elapsed 126%CPU (0avgtext+0avgdata 15388maxresident)k
+    0inputs+0outputs (0major+9449minor)pagefaults 0swaps
+
+What worse, speed does not improve on subsequent invocation.
+
+Why the problem?
+----------------
+
+Let's recall how it all works. If you have following line in your
+``/etc/apt/sources.list``:
+
+::
+
+    deb http://ftp.ru.debian.org/debian/ jessie main
+
+it means, that you can download contents file for your architecture like
+that:
+
+::
+
+    $ wget http://ftp.ru.debian.org/debian/dists/jessie/main/Contents-i386.gz
+
+where ``jessie`` is release name and ``main`` is it's component. This
+file (uncompressed) have some header and sorted lines like this:
+
+::
+
+    etc/sudoers          admin/sudo
+    etc/init.d/sudo      admin/sudo
+    etc/sudoers.d/README admin/sudo
+    ...
+    usr/bin/fontforge    fonts/fontforge,fonts/fontforge-nox
+
+where first part is name of file (yes, leading slash is missing) and
+second one is section and name of binary package. There can be more then
+one of binary packages, owning same file, in which case names of binary
+packages are separated by comma.
+
+For all repositories I included (jessie, jessie-backports, testing, sid,
+experimental), it nets over 16 millions lines and around 2Gb
+uncompressed size.
+
+There are multitude of ways to efficiently store data for **exact**
+search -- from GNU dbm database to full text search engine Xapian. But
+none for efficient regular expression search.
+
+So what ``apt-file`` does is a little more advanced then
+``zgrep <pattern> Content.gz``. It means over 16 millions of regular
+expression match attempts. No wonders that it takes time.
+
+Is there better way?
+--------------------
+
+If we want to retain full power of perl regular expression -- no. But do
+we really need it? Personally, I usually use it when I am looking for
+some C header of executable file. I can also imagine the need to locate
+what package provides some Perl, Python or Haskell module.
+
+I never experienced the need to use regular expression search. Actually,
+often I forget that search is regex-based and get surprised, when I
+receive too much results.
+
+Alternative solution would be program of following interface:
+
+.. code:: sh
+
+
+    $ apt-seek --bin 2to3
+    $ apt-seek --man posix_spawn
+    $ apt-seek --header X11/keysum.h
+    $ apt-seek --header keysum.h
+    $ apt-seek --lib gdbm
+    $ apt-seek --haskell Data.Profunctor
+
+Such program would maintain separate databases for every category of
+search queries (headers database, libraries database, ...). Such
+solution would not be able to obsolete ``apt-file``, since it is less
+powerful, and I expect them to co-exist for rather long time.
+
+What is done?
+-------------
+
+Crude implementation in C and shell is available from my git
+repository
+
+.. code:: sh
+
+    git clone https://anonscm.debian.org/cgit/users/kaction-guest/apt-seek.git
+
+
+As thoroughly discussed at `#854615 <http://bugs.debian.org/854615>`_
+this implementation has a lot of drawbacks and should actually be
+incorporated into *apt-file*. But for now *apt-seek* works fine for
+me, so incorporating into *apt-file* is not top of my priorities.

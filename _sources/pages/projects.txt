@@ -1,0 +1,96 @@
+Projects
+========
+
+Here is incomplete lists of software I developed or contributed to.
+
+.. contents::
+
+Cdist
+-----
+
+`Cdist <http://www.nico.schottelius.org/software/cdist/>`_ is
+configuration management system. It allows me to write simple shell
+code, describing what system configuration I want some ssh-accessible
+system to have, and --- magic --- cdist makes it happen.
+
+I maintain Debian packaging of Cdist,
+
+.. code:: sh
+
+    git clone https://anonscm.debian.org/cgit/users/kaction-guest/cdist.git
+
+configuration of my computers
+
+.. code:: sh
+
+    git clone https://anonscm.debian.org/cgit/users/kaction-guest/cdist-cfg-v2.git
+
+and ocassionally contribute minor fixes back into upstream [1]_
+
+.. highlight:: none
+.. code::
+
+     6d277ef1 New type: __dot_file
+     c4c2d45e New type: __hosts
+     1875bce5 Add support for guixsd into os explorer
+     b1152464 Include relicense agreements
+     ffc3451c GPLv3+ relicensing: Ricardo Catalinas
+     88ec06d0 new type: __hosts
+     7d6990d9 By default, package is not autoremoved, if it either suggested or recommened, but not is dependency for some other.  With this change, either package is dependency of manually installed, either is is subject to autoremove.
+     10735ffb Description: Fix spelling in manuals
+
+.. [1]  Yes, I am ashamed of my spelling. But there is no way to change history.
+
+Runit
+-----
+
+.. code::
+
+    runit is a collection of tools to provide system-wide service
+    supervision and to manage services.  Contrary to sysv init, it not
+    only cares about starting and stopping services, but also
+    supervises the service daemons while they are running.  Amongst
+    other things, it provides a reliable interface to send signals to
+    service daemons without the need for pid-files, and a log facility
+    with automatic log file rotation and disk space limits.
+
+I took over *runit* Debian package since version *2.1.2-4* from
+upstream developer, Gerrit Pape. On path to *runit_2.1.2-9*, which is
+now drop-in replacement for sysvinit, there were
+
+* developed two auxiliary debhelpers --- *dh-runit* and *dh-sysuser*,
+  to make integration with *runit* as painless, as possible
+
+* made huge mistake, which made transition from *2.1.2-6* to 2.1.2-7*
+  require manual tweaking of dpkg files. I am sorry.
+
+* made a lot of lesser errors, bad design solutions and so on.
+
+There is still a lot to do, but after release of Debian 9, I plan to
+finally push *runit* into ``Pre-Depends`` of *init* binary package,
+make it first-class Debian boot system.
+
+I consider this work my most significant project. My contribution to a
+war aganist systemd. I feel sorry that systemd is Free Software. It
+feels a bit like a civil war.
+
+Other Debian packages
+---------------------
+
+This `QA page
+<http://qa.debian.org/developer.php?login=KAction@gnu.org>`_ will give
+an overview of packages I maintain, but do ignore haskell packages ---
+I am still listed as uploader, but I am not active on Debian Haskell
+Group for at least year.
+
+..
+   Document other projects, in particular mmh fork, Guile-Bash, xselectd and
+   other.
+
+Undocumented
+------------
+
+List of all my repositories can be viewed on `Alioth
+<https://anonscm.debian.org/cgit/users/kaction-guest>`_.  Some of them
+are referenced in my other blog posts, others... well, feel free to
+clone and hack around.

@@ -1,0 +1,213 @@
+<!DOCTYPE html><head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="This is an awesome blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Speeding up apt-file &mdash; sinsekvu</title>
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/modern5.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/font-awesome.min.css" type="text/css">
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+	<script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="On suckless software" href="../../../2016/01/14/on_suckless_software.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.5.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Adjusts document height if sidebar is taller
+            var documentwrapper = document.getElementsByTagName("article")[0];
+            var sidebar = document.getElementsByClassName("sidebar")[0];
+
+            if (sidebar.offsetHeight > documentwrapper.offsetHeight)
+            {
+                var mainwrapper = document.getElementsByClassName("main")[0];
+                documentwrapper.style.minHeight = mainwrapper.offsetHeight + "px";
+            }
+
+            // Scroll to content if on small screen
+            if (screen.width < 480)
+            {
+                $(document).scrollTop(document.getElementsByTagName("article")[0].offsetTop - 44);
+            }
+        });
+    </script></head>
+    <body role="document">
+
+      <div id="container"><header role="banner">
+            <hgroup>
+              <h1><a href="../../../index.html">sinsekvu</a></h1><h2>Choose values, actions follow</h2></hgroup>
+          </header>
+      <nav role="navigation">
+            <ul><li class="quicklink"><div class="rss">
+        <a href="../../../rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
+    </div></li><li class="main-nav">
+                  <a href="../../../index.html">Home</a>
+                </li>
+              <li class="main-nav">
+                  <a href="../../../pages/contact.html">Contact</a>
+                </li>
+              <li class="main-nav">
+                  <a href="../../../pages/projects.html">Projects</a>
+                </li>
+              <li class="main-nav">
+                  <a href="../../../pages/about.html">About me</a>
+                </li>
+              </ul>
+          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article"><ul class="related clearfix">
+            <li class="left"></li>
+            <li class="right"><a href="../../../2016/01/14/on_suckless_software.html">On suckless software</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>April 03, 2017</span>
+        </div>
+    <div class="section" id="speeding-up-apt-file">
+<h1>Speeding up apt-file</h1>
+<p>Almost every GNU/Linux distribution provide means to tell what package
+does given file in your file system belong to. Debian based distribution
+allow you to tell what package you have to install in order to get given
+file in your file system.</p>
+<p>You may want it, if</p>
+<ul class="simple">
+<li>you are compiling from source some software, and build fails due
+missing headers or libraries. For example, what package provides
+<span class="docutils literal"><span class="pre">X11/keysym.h</span></span>?</li>
+<li>you saw some article on web, that mentions some command, and you have
+no idea where does it comes from. Did you knew, for example, that
+program <span class="docutils literal"><span class="pre">xxd</span></span>, which converts file into declaration of C byte array
+of same content, is part of vim?</li>
+<li>you was told to <span class="docutils literal"><span class="pre">use</span> <span class="pre">HTML::LinkExtractor</span></span> perl module and you are
+interested where to get it. (No, ad-hoc installs via <span class="docutils literal"><span class="pre">cpan</span></span> are not
+good enough)</li>
+</ul>
+<p>To do all above and more, you can use <span class="docutils literal"><span class="pre">apt-file</span></span> program. With
+<span class="docutils literal"><span class="pre">apt-file</span></span> you do not need search web or ask people on IRC:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ apt-file find stupid-header.h
+$ apt-file find /bin/xxd
+</pre></div>
+</div>
+<p>and you are done. Actually, you can use power of perl regular
+expressions to search for files. But this power comes at price.</p>
+<div class="section" id="and-what-the-problem">
+<h2>And what the problem?</h2>
+<p><span class="docutils literal"><span class="pre">apt-file</span></span> is very slow:</p>
+<div class="code sh highlight-default"><div class="highlight"><pre><span></span>$ apt-file find /bin/xxd
+vim-common: /usr/bin/xxd
+vim-dbg: /usr/lib/debug/usr/bin/xxd
+xxd: /usr/bin/xxd
+xxdiff: /usr/bin/xxdiff
+12.34user 0.55system 0:10.19elapsed 126%CPU (0avgtext+0avgdata 15388maxresident)k
+0inputs+0outputs (0major+9449minor)pagefaults 0swaps
+</pre></div>
+</div>
+<p>What worse, speed does not improve on subsequent invocation.</p>
+</div>
+<div class="section" id="why-the-problem">
+<h2>Why the problem?</h2>
+<p>Let&#8217;s recall how it all works. If you have following line in your
+<span class="docutils literal"><span class="pre">/etc/apt/sources.list</span></span>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">deb</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ftp</span><span class="o">.</span><span class="n">ru</span><span class="o">.</span><span class="n">debian</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">debian</span><span class="o">/</span> <span class="n">jessie</span> <span class="n">main</span>
+</pre></div>
+</div>
+<p>it means, that you can download contents file for your architecture like
+that:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ wget http://ftp.ru.debian.org/debian/dists/jessie/main/Contents-i386.gz
+</pre></div>
+</div>
+<p>where <span class="docutils literal"><span class="pre">jessie</span></span> is release name and <span class="docutils literal"><span class="pre">main</span></span> is it&#8217;s component. This
+file (uncompressed) have some header and sorted lines like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">etc</span><span class="o">/</span><span class="n">sudoers</span>          <span class="n">admin</span><span class="o">/</span><span class="n">sudo</span>
+<span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">sudo</span>      <span class="n">admin</span><span class="o">/</span><span class="n">sudo</span>
+<span class="n">etc</span><span class="o">/</span><span class="n">sudoers</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">README</span> <span class="n">admin</span><span class="o">/</span><span class="n">sudo</span>
+<span class="o">...</span>
+<span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">fontforge</span>    <span class="n">fonts</span><span class="o">/</span><span class="n">fontforge</span><span class="p">,</span><span class="n">fonts</span><span class="o">/</span><span class="n">fontforge</span><span class="o">-</span><span class="n">nox</span>
+</pre></div>
+</div>
+<p>where first part is name of file (yes, leading slash is missing) and
+second one is section and name of binary package. There can be more then
+one of binary packages, owning same file, in which case names of binary
+packages are separated by comma.</p>
+<p>For all repositories I included (jessie, jessie-backports, testing, sid,
+experimental), it nets over 16 millions lines and around 2Gb
+uncompressed size.</p>
+<p>There are multitude of ways to efficiently store data for <strong>exact</strong>
+search &#8211; from GNU dbm database to full text search engine Xapian. But
+none for efficient regular expression search.</p>
+<p>So what <span class="docutils literal"><span class="pre">apt-file</span></span> does is a little more advanced then
+<span class="docutils literal"><span class="pre">zgrep</span> <span class="pre">&lt;pattern&gt;</span> <span class="pre">Content.gz</span></span>. It means over 16 millions of regular
+expression match attempts. No wonders that it takes time.</p>
+</div>
+<div class="section" id="is-there-better-way">
+<h2>Is there better way?</h2>
+<p>If we want to retain full power of perl regular expression &#8211; no. But do
+we really need it? Personally, I usually use it when I am looking for
+some C header of executable file. I can also imagine the need to locate
+what package provides some Perl, Python or Haskell module.</p>
+<p>I never experienced the need to use regular expression search. Actually,
+often I forget that search is regex-based and get surprised, when I
+receive too much results.</p>
+<p>Alternative solution would be program of following interface:</p>
+<div class="code sh highlight-default"><div class="highlight"><pre><span></span>$ apt-seek --bin 2to3
+$ apt-seek --man posix_spawn
+$ apt-seek --header X11/keysum.h
+$ apt-seek --header keysum.h
+$ apt-seek --lib gdbm
+$ apt-seek --haskell Data.Profunctor
+</pre></div>
+</div>
+<p>Such program would maintain separate databases for every category of
+search queries (headers database, libraries database, ...). Such
+solution would not be able to obsolete <span class="docutils literal"><span class="pre">apt-file</span></span>, since it is less
+powerful, and I expect them to co-exist for rather long time.</p>
+</div>
+<div class="section" id="what-is-done">
+<h2>What is done?</h2>
+<p>Crude implementation in C and shell is available from my git
+repository</p>
+<div class="code sh highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">anonscm</span><span class="o">.</span><span class="n">debian</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">cgit</span><span class="o">/</span><span class="n">users</span><span class="o">/</span><span class="n">kaction</span><span class="o">-</span><span class="n">guest</span><span class="o">/</span><span class="n">apt</span><span class="o">-</span><span class="n">seek</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>As thoroughly discussed at <a class="reference external" href="http://bugs.debian.org/854615">#854615</a>
+this implementation has a lot of drawbacks and should actually be
+incorporated into <em>apt-file</em>. But for now <em>apt-seek</em> works fine for
+me, so incorporating into <em>apt-file</em> is not top of my priorities.</p>
+</div>
+</div>
+
+    <div class="postmeta">
+        <div class="author">
+            <span>Posted by Dmitry Bogatov</span>
+        </div>
+        
+        
+        </div>
+    <ul class="related clearfix">
+            <li class="left"></li>
+            <li class="right"><a href="../../../2016/01/14/on_suckless_software.html">On suckless software</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="#">Speeding up apt-file</a>
+        </li><li>
+            <a href="../../../2016/01/14/on_suckless_software.html">On suckless software</a>
+        </li><li>
+            <a href="../../../2016/06/22/text_editor_as_filter.html">$EDITOR as unix filter</a>
+        </li></ul>
+</div>
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
+
+        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2017, Dmitry Bogatov. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
+
+      </div> <!--! end of #container --></body>
+</html>

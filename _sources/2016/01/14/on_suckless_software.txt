@@ -1,0 +1,97 @@
+On suckless software
+====================
+
+.. author:: default
+.. categories:: none
+.. tags:: none
+.. comments::
+
+*Warning: this article is not purely technical. Opinions, reasoning and
+contradictions are present.*
+
+Conflict of interests is terrible thing. It is very unpleasant, when
+there are two principles that you follow and some day you encounter
+subject on which they contradict. It happened with me and software.
+
+First, and primary requirement on software must be
+`free <http://www.gnu.org/philosophy/free-software-even-more-important.html>`__.
+No exceptions. But there is another consideration. With everything else
+equal, GPL is better then BSD/MIT/other-non-copyleft-junk. GPLv2+ is
+better then GPLv2 and so on. But what about cases, where not everything
+else is equal?
+
+Lets compare *GNU Screen (v.4.2.1)* and ``tmux(v2.1)`` -- last released
+version at time of writing. Screen is GPLv3+, tmux is BSD-3-clause. On
+my personal experience, tmux is slightly simpler to use. Also, it have
+feature to number panes starting with 1. Implementing it in Screen is
+rather complicated and fragile. With all this, Screen contains 40015
+lines of Ansi C code, tmux -- 34859. And in my opinion, tmux codebase is
+simpler to understand. Not a dealmaker? Right, read on.
+
+Some time ago I learned about [suckless.org]. It is better to just quote
+their philosophy:
+
+.. code::
+
+    Designing simple and elegant software is far more difficult than
+    letting ad-hoc or over-ambitious features obscure the code over
+    time.  However one has to pay this price to achieve reliability
+    and maintainability.  Furthermore, minimalism results in
+    reasonable and attainable goals. We strive to maintain minimalism
+    and clarity to drive development to completion.
+
+And I was convinced, that most software I use is really bloated. Lets
+continue the terminal multiplexer theme and consider ``dvtm-0.12``,
+present in Debian jessie. With configuration at build time, it manages
+to deliver same functionality as ``tmux`` or ``GNU Screen``, within 3925
+lines of code. Latest version, v0.15 have even **less** lines of code --
+3848. One can blame me, that I am too concerned with lines counting. In
+other cases I would agree, that ~100 lines difference is nothing. But
+let me tell you what was under hood. Version 0.12 implemented what
+``tmux`` calls ``copy-mode`` itself -- movement, selection and so on.
+Version 0.15 dropped it in favor of pipe: pipe all terminal history to
+external process, read it's output and here is paste buffer. Brilliant
+solution in unix way.
+
+But real revelation was text editor
+`sandy <http://tools.suckless.org/sandy>`__. It is about ~2500 lines of
+code, which I can understand within several minutes. I always belived,
+that text editor is a beast of extereme complexity, like emacs with over
+a million lines of lisp code or vim with 300k lines of C code with load
+of conditional compilation. Why the hell support some shitty proprietary
+operating system that is not POSIX-complaint? No doubt, suckless
+software is not for everyone. By design, it is for advanced users.
+
+Here is contradiction. From my point of view, suckless is really
+superior from techincal point of view and inferior from political. What
+matters more?
+
+*Here is my answer for myself.* There is nothing wrong with using and
+improving free, but not copyleft software, although copyleft one would
+be better. Many blame GNU Software for beeing bloated, but let me
+advocate us [1]_. GNU is how it all started. Free software started with
+GNU Manifesto, Emacs, gcc and gdb. Many GNU projects are first of their
+kind in free world. Bash, GCC, Screen, GDB, Coreutils -- they all was
+first, and it is hard to be first. Every subsequent project was able to
+use wisdom of it's ancestors mistakes. GNU mistakes. History is never
+kind to us.
+
+And there is another consideration. GNU's priority is freedom of
+users.  And most of them will never write a line of C. If you ever set
+up a GNU/Linux system for a person, who can't even invoke ``apt-get
+install`` in command line, you know that is is much, much harder, than
+setup for yourself. GNU, and many other "bloated" programs attempts to
+make happy as much non-programmers, as possible. It has it's price,
+huge price, that suckless project refuses to pay. I no longer beleive
+that one day everyone will be GNU/Linux hacker, so there always will
+have to be someone to pay this price.
+
+I take my hat off to developers, who is proficent with command line
+and scripting, but still volonter developing projects like Evolution,
+Dolphin or Gmpc. Sorry, but I do not have willpower to develop
+something I will not use. All I can do is diplomacy and release
+everything I create under GPLv3+.
+
+.. [1]
+   After all, I consider myself member of GNU, although I was not too
+   active recently.

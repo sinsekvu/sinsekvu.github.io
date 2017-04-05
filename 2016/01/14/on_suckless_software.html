@@ -1,0 +1,185 @@
+<!DOCTYPE html><head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="This is an awesome blog">
+        <meta name="viewport" content="width=device-width">
+        <title>On suckless software &mdash; sinsekvu</title>
+            <link rel="stylesheet" href="../../../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/modern5.css" type="text/css">
+            <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../../../_static/font-awesome.min.css" type="text/css">
+        <link rel="shortcut icon" href="../../../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+	<script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/plugins.js"></script>
+        <script src="../../../_static/main.js"></script>
+        <link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="$EDITOR as unix filter" href="../../06/22/text_editor_as_filter.html" /><link rel="prev" title="Speeding up apt-file" href="../../../2017/04/03/speeding_up_apt_file.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../../../rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.5.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="../../../_static/underscore.js"></script><script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Adjusts document height if sidebar is taller
+            var documentwrapper = document.getElementsByTagName("article")[0];
+            var sidebar = document.getElementsByClassName("sidebar")[0];
+
+            if (sidebar.offsetHeight > documentwrapper.offsetHeight)
+            {
+                var mainwrapper = document.getElementsByClassName("main")[0];
+                documentwrapper.style.minHeight = mainwrapper.offsetHeight + "px";
+            }
+
+            // Scroll to content if on small screen
+            if (screen.width < 480)
+            {
+                $(document).scrollTop(document.getElementsByTagName("article")[0].offsetTop - 44);
+            }
+        });
+    </script></head>
+    <body role="document">
+
+      <div id="container"><header role="banner">
+            <hgroup>
+              <h1><a href="../../../index.html">sinsekvu</a></h1><h2>Choose values, actions follow</h2></hgroup>
+          </header>
+      <nav role="navigation">
+            <ul><li class="quicklink"><div class="rss">
+        <a href="../../../rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
+    </div></li><li class="main-nav">
+                  <a href="../../../index.html">Home</a>
+                </li>
+              <li class="main-nav">
+                  <a href="../../../pages/contact.html">Contact</a>
+                </li>
+              <li class="main-nav">
+                  <a href="../../../pages/projects.html">Projects</a>
+                </li>
+              <li class="main-nav">
+                  <a href="../../../pages/about.html">About me</a>
+                </li>
+              </ul>
+          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article"><ul class="related clearfix">
+            <li class="left"> &laquo; <a href="../../../2017/04/03/speeding_up_apt_file.html">Speeding up apt-file</a></li>
+            <li class="right"><a href="../../06/22/text_editor_as_filter.html">$EDITOR as unix filter</a> &raquo; </li>
+        </ul><div class="timestamp postmeta">
+            <span>January 14, 2016</span>
+        </div>
+    <div class="section" id="on-suckless-software">
+<h1>On suckless software</h1>
+<p><em>Warning: this article is not purely technical. Opinions, reasoning and
+contradictions are present.</em></p>
+<p>Conflict of interests is terrible thing. It is very unpleasant, when
+there are two principles that you follow and some day you encounter
+subject on which they contradict. It happened with me and software.</p>
+<p>First, and primary requirement on software must be
+<a class="reference external" href="http://www.gnu.org/philosophy/free-software-even-more-important.html">free</a>.
+No exceptions. But there is another consideration. With everything else
+equal, GPL is better then BSD/MIT/other-non-copyleft-junk. GPLv2+ is
+better then GPLv2 and so on. But what about cases, where not everything
+else is equal?</p>
+<p>Lets compare <em>GNU Screen (v.4.2.1)</em> and <span class="docutils literal"><span class="pre">tmux(v2.1)</span></span> &#8211; last released
+version at time of writing. Screen is GPLv3+, tmux is BSD-3-clause. On
+my personal experience, tmux is slightly simpler to use. Also, it have
+feature to number panes starting with 1. Implementing it in Screen is
+rather complicated and fragile. With all this, Screen contains 40015
+lines of Ansi C code, tmux &#8211; 34859. And in my opinion, tmux codebase is
+simpler to understand. Not a dealmaker? Right, read on.</p>
+<p>Some time ago I learned about [suckless.org]. It is better to just quote
+their philosophy:</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">Designing</span> <span class="n">simple</span> <span class="ow">and</span> <span class="n">elegant</span> <span class="n">software</span> <span class="ow">is</span> <span class="n">far</span> <span class="n">more</span> <span class="n">difficult</span> <span class="n">than</span>
+<span class="n">letting</span> <span class="n">ad</span><span class="o">-</span><span class="n">hoc</span> <span class="ow">or</span> <span class="n">over</span><span class="o">-</span><span class="n">ambitious</span> <span class="n">features</span> <span class="n">obscure</span> <span class="n">the</span> <span class="n">code</span> <span class="n">over</span>
+<span class="n">time</span><span class="o">.</span>  <span class="n">However</span> <span class="n">one</span> <span class="n">has</span> <span class="n">to</span> <span class="n">pay</span> <span class="n">this</span> <span class="n">price</span> <span class="n">to</span> <span class="n">achieve</span> <span class="n">reliability</span>
+<span class="ow">and</span> <span class="n">maintainability</span><span class="o">.</span>  <span class="n">Furthermore</span><span class="p">,</span> <span class="n">minimalism</span> <span class="n">results</span> <span class="ow">in</span>
+<span class="n">reasonable</span> <span class="ow">and</span> <span class="n">attainable</span> <span class="n">goals</span><span class="o">.</span> <span class="n">We</span> <span class="n">strive</span> <span class="n">to</span> <span class="n">maintain</span> <span class="n">minimalism</span>
+<span class="ow">and</span> <span class="n">clarity</span> <span class="n">to</span> <span class="n">drive</span> <span class="n">development</span> <span class="n">to</span> <span class="n">completion</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>And I was convinced, that most software I use is really bloated. Lets
+continue the terminal multiplexer theme and consider <span class="docutils literal"><span class="pre">dvtm-0.12</span></span>,
+present in Debian jessie. With configuration at build time, it manages
+to deliver same functionality as <span class="docutils literal"><span class="pre">tmux</span></span> or <span class="docutils literal"><span class="pre">GNU</span> <span class="pre">Screen</span></span>, within 3925
+lines of code. Latest version, v0.15 have even <strong>less</strong> lines of code &#8211;
+3848. One can blame me, that I am too concerned with lines counting. In
+other cases I would agree, that ~100 lines difference is nothing. But
+let me tell you what was under hood. Version 0.12 implemented what
+<span class="docutils literal"><span class="pre">tmux</span></span> calls <span class="docutils literal"><span class="pre">copy-mode</span></span> itself &#8211; movement, selection and so on.
+Version 0.15 dropped it in favor of pipe: pipe all terminal history to
+external process, read it&#8217;s output and here is paste buffer. Brilliant
+solution in unix way.</p>
+<p>But real revelation was text editor
+<a class="reference external" href="http://tools.suckless.org/sandy">sandy</a>. It is about ~2500 lines of
+code, which I can understand within several minutes. I always belived,
+that text editor is a beast of extereme complexity, like emacs with over
+a million lines of lisp code or vim with 300k lines of C code with load
+of conditional compilation. Why the hell support some shitty proprietary
+operating system that is not POSIX-complaint? No doubt, suckless
+software is not for everyone. By design, it is for advanced users.</p>
+<p>Here is contradiction. From my point of view, suckless is really
+superior from techincal point of view and inferior from political. What
+matters more?</p>
+<p><em>Here is my answer for myself.</em> There is nothing wrong with using and
+improving free, but not copyleft software, although copyleft one would
+be better. Many blame GNU Software for beeing bloated, but let me
+advocate us <a class="footnote-reference" href="#id2" id="id1">[1]</a>. GNU is how it all started. Free software started with
+GNU Manifesto, Emacs, gcc and gdb. Many GNU projects are first of their
+kind in free world. Bash, GCC, Screen, GDB, Coreutils &#8211; they all was
+first, and it is hard to be first. Every subsequent project was able to
+use wisdom of it&#8217;s ancestors mistakes. GNU mistakes. History is never
+kind to us.</p>
+<p>And there is another consideration. GNU&#8217;s priority is freedom of
+users.  And most of them will never write a line of C. If you ever set
+up a GNU/Linux system for a person, who can&#8217;t even invoke <span class="docutils literal"><span class="pre">apt-get</span>
+<span class="pre">install</span></span> in command line, you know that is is much, much harder, than
+setup for yourself. GNU, and many other &#8220;bloated&#8221; programs attempts to
+make happy as much non-programmers, as possible. It has it&#8217;s price,
+huge price, that suckless project refuses to pay. I no longer beleive
+that one day everyone will be GNU/Linux hacker, so there always will
+have to be someone to pay this price.</p>
+<p>I take my hat off to developers, who is proficent with command line
+and scripting, but still volonter developing projects like Evolution,
+Dolphin or Gmpc. Sorry, but I do not have willpower to develop
+something I will not use. All I can do is diplomacy and release
+everything I create under GPLv3+.</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>After all, I consider myself member of GNU, although I was not too
+active recently.</td></tr>
+</tbody>
+</table>
+</div>
+
+    <div class="postmeta">
+        <div class="author">
+            <span>Posted by Dmitry Bogatov</span>
+        </div>
+        
+        
+        </div>
+    <ul class="related clearfix">
+            <li class="left"> &laquo; <a href="../../../2017/04/03/speeding_up_apt_file.html">Speeding up apt-file</a></li>
+            <li class="right"><a href="../../06/22/text_editor_as_filter.html">$EDITOR as unix filter</a> &raquo; </li>
+        </ul></article><aside class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="../../../2017/04/03/speeding_up_apt_file.html">Speeding up apt-file</a>
+        </li><li>
+            <a href="#">On suckless software</a>
+        </li><li>
+            <a href="../../06/22/text_editor_as_filter.html">$EDITOR as unix filter</a>
+        </li></ul>
+</div>
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
+
+        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2017, Dmitry Bogatov. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
+
+      </div> <!--! end of #container --></body>
+</html>

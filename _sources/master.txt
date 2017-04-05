@@ -1,0 +1,12 @@
+Sitemap
+=======
+
+.. toctree::
+   :maxdepth: 1
+
+   2017/04/03/speeding_up_apt_file
+   2016/01/14/on_suckless_software
+   2016/06/22/text_editor_as_filter
+   pages/contact
+   pages/projects
+   pages/about

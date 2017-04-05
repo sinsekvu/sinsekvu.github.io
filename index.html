@@ -1,0 +1,464 @@
+<!DOCTYPE html><head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="This is an awesome blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Home &mdash; sinsekvu</title>
+            <link rel="stylesheet" href="_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="_static/main.css" type="text/css">
+            <link rel="stylesheet" href="_static/modern5.css" type="text/css">
+            <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="_static/font-awesome.min.css" type="text/css">
+        <link rel="shortcut icon" href="_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+	<script src="_static/jquery.js"></script>
+        <script src="_static/plugins.js"></script>
+        <script src="_static/main.js"></script>
+        <link rel="search" title="Search" href="search.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="_static/underscore.js"></script><script type="text/javascript" src="_static/doctools.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Adjusts document height if sidebar is taller
+            var documentwrapper = document.getElementsByTagName("article")[0];
+            var sidebar = document.getElementsByClassName("sidebar")[0];
+
+            if (sidebar.offsetHeight > documentwrapper.offsetHeight)
+            {
+                var mainwrapper = document.getElementsByClassName("main")[0];
+                documentwrapper.style.minHeight = mainwrapper.offsetHeight + "px";
+            }
+
+            // Scroll to content if on small screen
+            if (screen.width < 480)
+            {
+                $(document).scrollTop(document.getElementsByTagName("article")[0].offsetTop - 44);
+            }
+        });
+    </script></head>
+    <body role="document">
+
+      <div id="container"><header role="banner">
+            <hgroup>
+              <h1><a href="#">sinsekvu</a></h1><h2>Choose values, actions follow</h2></hgroup>
+          </header>
+      <nav role="navigation">
+            <ul><li class="quicklink"><div class="rss">
+        <a href="rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
+    </div></li><li class="main-nav">
+                  <a href="#">Home</a>
+                </li>
+              <li class="main-nav">
+                  <a href="pages/contact.html">Contact</a>
+                </li>
+              <li class="main-nav">
+                  <a href="pages/projects.html">Projects</a>
+                </li>
+              <li class="main-nav">
+                  <a href="pages/about.html">About me</a>
+                </li>
+              </ul>
+          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article"><div class="timestamp postmeta">
+            <span>April 03, 2017</span>
+        </div>
+        <div class="section">
+            <h1><a href="2017/04/03/speeding_up_apt_file.html">Speeding up apt-file</a></h1>
+<p>Almost every GNU/Linux distribution provide means to tell what package
+does given file in your file system belong to. Debian based distribution
+allow you to tell what package you have to install in order to get given
+file in your file system.</p>
+<p>You may want it, if</p>
+<ul class="simple">
+<li>you are compiling from source some software, and build fails due
+missing headers or libraries. For example, what package provides
+<span class="docutils literal"><span class="pre">X11/keysym.h</span></span>?</li>
+<li>you saw some article on web, that mentions some command, and you have
+no idea where does it comes from. Did you knew, for example, that
+program <span class="docutils literal"><span class="pre">xxd</span></span>, which converts file into declaration of C byte array
+of same content, is part of vim?</li>
+<li>you was told to <span class="docutils literal"><span class="pre">use</span> <span class="pre">HTML::LinkExtractor</span></span> perl module and you are
+interested where to get it. (No, ad-hoc installs via <span class="docutils literal"><span class="pre">cpan</span></span> are not
+good enough)</li>
+</ul>
+<p>To do all above and more, you can use <span class="docutils literal"><span class="pre">apt-file</span></span> program. With
+<span class="docutils literal"><span class="pre">apt-file</span></span> you do not need search web or ask people on IRC:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/>$ apt-file find stupid-header.h
+$ apt-file find /bin/xxd
+</pre></div>
+</div>
+<p>and you are done. Actually, you can use power of perl regular
+expressions to search for files. But this power comes at price.</p>
+<div class="section" id="and-what-the-problem">
+<h2>And what the problem?</h2>
+<p><span class="docutils literal"><span class="pre">apt-file</span></span> is very slow:</p>
+<div class="code sh highlight-default"><div class="highlight"><pre><span/>$ apt-file find /bin/xxd
+vim-common: /usr/bin/xxd
+vim-dbg: /usr/lib/debug/usr/bin/xxd
+xxd: /usr/bin/xxd
+xxdiff: /usr/bin/xxdiff
+12.34user 0.55system 0:10.19elapsed 126%CPU (0avgtext+0avgdata 15388maxresident)k
+0inputs+0outputs (0major+9449minor)pagefaults 0swaps
+</pre></div>
+</div>
+<p>What worse, speed does not improve on subsequent invocation.</p>
+</div>
+<div class="section" id="why-the-problem">
+<h2>Why the problem?</h2>
+<p>Let’s recall how it all works. If you have following line in your
+<span class="docutils literal"><span class="pre">/etc/apt/sources.list</span></span>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">deb</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ftp</span><span class="o">.</span><span class="n">ru</span><span class="o">.</span><span class="n">debian</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">debian</span><span class="o">/</span> <span class="n">jessie</span> <span class="n">main</span>
+</pre></div>
+</div>
+<p>it means, that you can download contents file for your architecture like
+that:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/>$ wget http://ftp.ru.debian.org/debian/dists/jessie/main/Contents-i386.gz
+</pre></div>
+</div>
+<p>where <span class="docutils literal"><span class="pre">jessie</span></span> is release name and <span class="docutils literal"><span class="pre">main</span></span> is it’s component. This
+file (uncompressed) have some header and sorted lines like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span/><span class="n">etc</span><span class="o">/</span><span class="n">sudoers</span>          <span class="n">admin</span><span class="o">/</span><span class="n">sudo</span>
+<span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">sudo</span>      <span class="n">admin</span><span class="o">/</span><span class="n">sudo</span>
+<span class="n">etc</span><span class="o">/</span><span class="n">sudoers</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">README</span> <span class="n">admin</span><span class="o">/</span><span class="n">sudo</span>
+<span class="o">...</span>
+<span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">fontforge</span>    <span class="n">fonts</span><span class="o">/</span><span class="n">fontforge</span><span class="p">,</span><span class="n">fonts</span><span class="o">/</span><span class="n">fontforge</span><span class="o">-</span><span class="n">nox</span>
+</pre></div>
+</div>
+<p>where first part is name of file (yes, leading slash is missing) and
+second one is section and name of binary package. There can be more then
+one of binary packages, owning same file, in which case names of binary
+packages are separated by comma.</p>
+<p>For all repositories I included (jessie, jessie-backports, testing, sid,
+experimental), it nets over 16 millions lines and around 2Gb
+uncompressed size.</p>
+<p>There are multitude of ways to efficiently store data for <strong>exact</strong>
+search – from GNU dbm database to full text search engine Xapian. But
+none for efficient regular expression search.</p>
+<p>So what <span class="docutils literal"><span class="pre">apt-file</span></span> does is a little more advanced then
+<span class="docutils literal"><span class="pre">zgrep</span> <span class="pre">&lt;pattern&gt;</span> <span class="pre">Content.gz</span></span>. It means over 16 millions of regular
+expression match attempts. No wonders that it takes time.</p>
+</div>
+<div class="section" id="is-there-better-way">
+<h2>Is there better way?</h2>
+<p>If we want to retain full power of perl regular expression – no. But do
+we really need it? Personally, I usually use it when I am looking for
+some C header of executable file. I can also imagine the need to locate
+what package provides some Perl, Python or Haskell module.</p>
+<p>I never experienced the need to use regular expression search. Actually,
+often I forget that search is regex-based and get surprised, when I
+receive too much results.</p>
+<p>Alternative solution would be program of following interface:</p>
+<div class="code sh highlight-default"><div class="highlight"><pre><span/>$ apt-seek --bin 2to3
+$ apt-seek --man posix_spawn
+$ apt-seek --header X11/keysum.h
+$ apt-seek --header keysum.h
+$ apt-seek --lib gdbm
+$ apt-seek --haskell Data.Profunctor
+</pre></div>
+</div>
+<p>Such program would maintain separate databases for every category of
+search queries (headers database, libraries database, ...). Such
+solution would not be able to obsolete <span class="docutils literal"><span class="pre">apt-file</span></span>, since it is less
+powerful, and I expect them to co-exist for rather long time.</p>
+</div>
+<div class="section" id="what-is-done">
+<h2>What is done?</h2>
+<p>Crude implementation in C and shell is available from my git
+repository</p>
+<div class="code sh highlight-default"><div class="highlight"><pre><span/><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">anonscm</span><span class="o">.</span><span class="n">debian</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">cgit</span><span class="o">/</span><span class="n">users</span><span class="o">/</span><span class="n">kaction</span><span class="o">-</span><span class="n">guest</span><span class="o">/</span><span class="n">apt</span><span class="o">-</span><span class="n">seek</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>As thoroughly discussed at <a class="reference external" href="http://bugs.debian.org/854615">#854615</a>
+this implementation has a lot of drawbacks and should actually be
+incorporated into <em>apt-file</em>. But for now <em>apt-seek</em> works fine for
+me, so incorporating into <em>apt-file</em> is not top of my priorities.</p>
+</div>
+
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Dmitry Bogatov</span>
+        </div>
+        
+        
+        </div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>January 14, 2016</span>
+        </div>
+        <div class="section">
+            <h1><a href="2016/01/14/on_suckless_software.html">On suckless software</a></h1>
+<p><em>Warning: this article is not purely technical. Opinions, reasoning and
+contradictions are present.</em></p>
+<p>Conflict of interests is terrible thing. It is very unpleasant, when
+there are two principles that you follow and some day you encounter
+subject on which they contradict. It happened with me and software.</p>
+<p>First, and primary requirement on software must be
+<a class="reference external" href="http://www.gnu.org/philosophy/free-software-even-more-important.html">free</a>.
+No exceptions. But there is another consideration. With everything else
+equal, GPL is better then BSD/MIT/other-non-copyleft-junk. GPLv2+ is
+better then GPLv2 and so on. But what about cases, where not everything
+else is equal?</p>
+<p>Lets compare <em>GNU Screen (v.4.2.1)</em> and <span class="docutils literal"><span class="pre">tmux(v2.1)</span></span> – last released
+version at time of writing. Screen is GPLv3+, tmux is BSD-3-clause. On
+my personal experience, tmux is slightly simpler to use. Also, it have
+feature to number panes starting with 1. Implementing it in Screen is
+rather complicated and fragile. With all this, Screen contains 40015
+lines of Ansi C code, tmux – 34859. And in my opinion, tmux codebase is
+simpler to understand. Not a dealmaker? Right, read on.</p>
+<p>Some time ago I learned about [suckless.org]. It is better to just quote
+their philosophy:</p>
+<div class="code highlight-default"><div class="highlight"><pre><span/><span class="n">Designing</span> <span class="n">simple</span> <span class="ow">and</span> <span class="n">elegant</span> <span class="n">software</span> <span class="ow">is</span> <span class="n">far</span> <span class="n">more</span> <span class="n">difficult</span> <span class="n">than</span>
+<span class="n">letting</span> <span class="n">ad</span><span class="o">-</span><span class="n">hoc</span> <span class="ow">or</span> <span class="n">over</span><span class="o">-</span><span class="n">ambitious</span> <span class="n">features</span> <span class="n">obscure</span> <span class="n">the</span> <span class="n">code</span> <span class="n">over</span>
+<span class="n">time</span><span class="o">.</span>  <span class="n">However</span> <span class="n">one</span> <span class="n">has</span> <span class="n">to</span> <span class="n">pay</span> <span class="n">this</span> <span class="n">price</span> <span class="n">to</span> <span class="n">achieve</span> <span class="n">reliability</span>
+<span class="ow">and</span> <span class="n">maintainability</span><span class="o">.</span>  <span class="n">Furthermore</span><span class="p">,</span> <span class="n">minimalism</span> <span class="n">results</span> <span class="ow">in</span>
+<span class="n">reasonable</span> <span class="ow">and</span> <span class="n">attainable</span> <span class="n">goals</span><span class="o">.</span> <span class="n">We</span> <span class="n">strive</span> <span class="n">to</span> <span class="n">maintain</span> <span class="n">minimalism</span>
+<span class="ow">and</span> <span class="n">clarity</span> <span class="n">to</span> <span class="n">drive</span> <span class="n">development</span> <span class="n">to</span> <span class="n">completion</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>And I was convinced, that most software I use is really bloated. Lets
+continue the terminal multiplexer theme and consider <span class="docutils literal"><span class="pre">dvtm-0.12</span></span>,
+present in Debian jessie. With configuration at build time, it manages
+to deliver same functionality as <span class="docutils literal"><span class="pre">tmux</span></span> or <span class="docutils literal"><span class="pre">GNU</span> <span class="pre">Screen</span></span>, within 3925
+lines of code. Latest version, v0.15 have even <strong>less</strong> lines of code –
+3848. One can blame me, that I am too concerned with lines counting. In
+other cases I would agree, that ~100 lines difference is nothing. But
+let me tell you what was under hood. Version 0.12 implemented what
+<span class="docutils literal"><span class="pre">tmux</span></span> calls <span class="docutils literal"><span class="pre">copy-mode</span></span> itself – movement, selection and so on.
+Version 0.15 dropped it in favor of pipe: pipe all terminal history to
+external process, read it’s output and here is paste buffer. Brilliant
+solution in unix way.</p>
+<p>But real revelation was text editor
+<a class="reference external" href="http://tools.suckless.org/sandy">sandy</a>. It is about ~2500 lines of
+code, which I can understand within several minutes. I always belived,
+that text editor is a beast of extereme complexity, like emacs with over
+a million lines of lisp code or vim with 300k lines of C code with load
+of conditional compilation. Why the hell support some shitty proprietary
+operating system that is not POSIX-complaint? No doubt, suckless
+software is not for everyone. By design, it is for advanced users.</p>
+<p>Here is contradiction. From my point of view, suckless is really
+superior from techincal point of view and inferior from political. What
+matters more?</p>
+<p><em>Here is my answer for myself.</em> There is nothing wrong with using and
+improving free, but not copyleft software, although copyleft one would
+be better. Many blame GNU Software for beeing bloated, but let me
+advocate us <a class="footnote-reference" href="#id2" id="id1">[1]</a>. GNU is how it all started. Free software started with
+GNU Manifesto, Emacs, gcc and gdb. Many GNU projects are first of their
+kind in free world. Bash, GCC, Screen, GDB, Coreutils – they all was
+first, and it is hard to be first. Every subsequent project was able to
+use wisdom of it’s ancestors mistakes. GNU mistakes. History is never
+kind to us.</p>
+<p>And there is another consideration. GNU’s priority is freedom of
+users.  And most of them will never write a line of C. If you ever set
+up a GNU/Linux system for a person, who can’t even invoke <span class="docutils literal"><span class="pre">apt-get</span>
+<span class="pre">install</span></span> in command line, you know that is is much, much harder, than
+setup for yourself. GNU, and many other “bloated” programs attempts to
+make happy as much non-programmers, as possible. It has it’s price,
+huge price, that suckless project refuses to pay. I no longer beleive
+that one day everyone will be GNU/Linux hacker, so there always will
+have to be someone to pay this price.</p>
+<p>I take my hat off to developers, who is proficent with command line
+and scripting, but still volonter developing projects like Evolution,
+Dolphin or Gmpc. Sorry, but I do not have willpower to develop
+something I will not use. All I can do is diplomacy and release
+everything I create under GPLv3+.</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>After all, I consider myself member of GNU, although I was not too
+active recently.</td></tr>
+</tbody>
+</table>
+
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Dmitry Bogatov</span>
+        </div>
+        
+        
+        </div><div class="separator post_separator"></div><div class="timestamp postmeta">
+            <span>June 22, 2016</span>
+        </div>
+        <div class="section">
+            <h1><a href="2016/06/22/text_editor_as_filter.html">$EDITOR as unix filter</a></h1>
+<p>It is really, really strange, but none of major text editors –
+neither vim, nor emacs work as filter – I mean, you can’t pipe text
+into stdin, edit and have edited version on stdout. That is because
+stdout is expected to be tty, so editor writes control sequences on
+stdout, and we have expected behaviour. But we can do better – use
+stderr descriptor as tty, and save stdout for piping.</p>
+<p>Here is code of little C99, POSIX-2008 program, that invokes your
+`$EDITOR’ as filter.</p>
+<div class="code c highlight-default"><div class="highlight"><pre><span/>/* edit-stream.c --- invoke $EDITOR as filter */
+/* Copyright (C) 2016 Dmitry Bogatov &lt;KAction@gnu.org&gt; */
+
+/* This program is free software; you can redistribute it and/or */
+/* modify it under the terms of the GNU General Public License */
+/* as published by the Free Software Foundation; either version 3 */
+/* of the License, or (at your option) any later version. */
+
+/* This program is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the */
+/* GNU General Public License for more details. */
+
+/* You should have received a copy of the GNU General Public License */
+/* along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;. */
+
+#define _POSIX_C_SOURCE 200809L
+#include &lt;stdlib.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/stat.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/wait.h&gt;
+
+/* stdio.h would be overkill */
+#define write2(str) write(2, str, sizeof(str))
+
+int
+main(int argc, char **argv)
+{
+    int return_value = 1;
+    const char *tty = ttyname(2); /* POSIX.1-2001, did you knew? */
+    if (!tty) {
+        write2("stderr is not tty");
+        return 1;
+    }
+    int in = open(tty, O_RDONLY);
+    if (in == -1) {
+        write2("failed to open tty for reading");
+        return 1;
+    }
+    char tempname[] = "/tmp/edit-stream.XXXXXX";
+    int tempfd = mkstemp(tempname);
+    if (tempfd == -1) {
+        write2("failed to open temporary file");
+        goto err_close_tty;
+    }
+    /* POSIX does not mandates modes of temporary file. */
+    if (fchmod(tempfd, 0600) == -1) {
+        write2("failed to change mode of temporary file");
+        goto err_remove_tempfile;
+    }
+    char buffer[2048];
+    ssize_t bytes;
+    while ((bytes = read(0, buffer, sizeof(buffer))) &gt; 0) {
+        /* Here actually must be loop, since write(2) does not guarates
+         * that it will be able to write everything. But I am reckless.
+                 */
+        if (write(tempfd, buffer, bytes) != bytes) {
+            write2("failed to write data to temporary file");
+            goto err_remove_tempfile;
+        }
+    }
+    if (fsync(tempfd) == -1) {
+        write2("failed to fsync temporary file");
+        goto err_remove_tempfile;
+    }
+    if (close(tempfd) == -1) {
+        write2("failed to close temporary file");
+        goto err_remove_tempfile;
+    }
+    if (dup2(in, 0) == -1) {
+        write2("failed to set tty as stdin");
+        goto err_remove_tempfile;
+    }
+    int stdout = dup(1);
+    if (stdout == -1) {
+        write2("failed to create copy of stdout");
+        goto err_remove_tempfile;
+    }
+    /* Descriptor 2 (stderr) still points to tty */
+    if (dup2(2, 1) == -1) {
+        write2("failed to set tty as stdout");
+        goto err_close_stdout;
+    }
+    const char *editor = getenv("EDITOR");
+    if (!editor) {
+        write2("EDITOR is not set");
+        goto err_close_stdout;
+    }
+    pid_t pid = fork();
+    if (pid == 0) {
+        close(stdout);
+        close(tempfd);
+        close(in);
+        execlp(editor, editor, tempname, NULL);
+        _exit(129);
+    }
+    int status;
+    if (wait(&amp;status) == -1) {
+        write2("wait failed");
+        goto err_close_stdout;
+    }
+    if (!(WIFEXITED(status) &amp;&amp; WEXITSTATUS(status) == 0)) {
+        write2("editor invocation failed");
+        goto err_close_stdout;
+    }
+    int tempfd_r = open(tempname, O_RDONLY);
+    if (tempfd_r == -1) {
+        write2("failed to open for reading edited temporary file");
+        goto err_close_stdout;
+    }
+    while ((bytes = read(tempfd_r, buffer, sizeof(buffer))) &gt; 0) {
+        if (write(stdout, buffer, bytes) != bytes) {
+            write2("failed to write data to stdout");
+            goto err_close_tempfile_read;
+        }
+    }
+
+    return_value = 0;
+
+/* Clean up on error is best efford. Descriptors are closed, files
+   are unlinked, but nothing is checked. */
+err_close_tempfile_read:
+    close(tempfd_r);
+err_close_stdout:
+    close(stdout);
+err_remove_tempfile:
+    close(tempfd);
+    unlink(tempname);
+err_close_tty:
+    close(in);
+
+    close(0);
+    close(1);
+    close(2);
+
+    return return_value;
+}
+</pre></div>
+</div>
+
+        </div>
+        <div class="postmeta">
+        <div class="author">
+            <span>Posted by Dmitry Bogatov</span>
+        </div>
+        
+        
+        </div><div class="archive_link">
+        <a href="archive.html"> &mdash; Blog Archive &mdash; </a>
+    </div></article><aside class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="2017/04/03/speeding_up_apt_file.html">Speeding up apt-file</a>
+        </li><li>
+            <a href="2016/01/14/on_suckless_software.html">On suckless software</a>
+        </li><li>
+            <a href="2016/06/22/text_editor_as_filter.html">$EDITOR as unix filter</a>
+        </li></ul>
+</div>
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
+
+        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2017, Dmitry Bogatov. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
+
+      </div> <!--! end of #container --></body>
+</html>

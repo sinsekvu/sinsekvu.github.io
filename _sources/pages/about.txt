@@ -1,0 +1,65 @@
+About me
+--------
+
+.. image:: /_static/dmitry.png
+   :alt: my photo.
+   :align: right
+   :scale: 50
+
+Hello! My name is Dmitry Bogatov and here is my place in Web;
+just static pages — no damned javascript, no stupid
+"web-applicatiions", no tracking, no cookies. I did my best to
+eliminate every piece of JavaScript, even `free
+<https://gnu.org/philosophy/javascript-trap.html>`_ one, but browsing
+with JavaScript disabled is always good idea. I recommend `w3m
+<https://w3m.sourceforge.net>`_ browser.
+
+Who am I?
+=========
+
+* Free Software programmer, supporter and, to some extend, activist.
+  Everything I develop myself is license under GNU GPLv3+.  I do not
+  install any non-free software. No proprietary drivers, too!
+  Unfortunately, JavaScript is another, painful story.
+
+* Teacher. I post-graduated at Moscow State University, Faculty of
+  Mechanics and Mathematics, and currently make my living teaching
+  mathematics and programming private lessons for school and graduate
+  students. I have to admit, that none of my programming students
+  became Free Software contributors, as far as I know.
+
+* `Esperantisto <https://en.wikipedia.org/Esperanto>`_. I would not
+  say I do much for movement, but I do speak esperanto, take part in
+  events and do my best to convey thought, that there is still no
+  international general-purpose language. English is fine between us,
+  programmers, but by no means is general-purpose.
+
+What else do I support?
+=======================
+
+* Privacy. Privacy is important. For some time I did my best to
+  anonymous and not have network identity. Unfortunately, this
+  closed-world assumption did not work well for me. Too few of us
+  remember, that the main and the only true communication method is
+  email. But I still reject all those proprietary message programs,
+  browse over Tor, block tracking and use different for different
+  websites and do my best to share as little of my private
+  information, as possible.
+
+* Anarchy and human rights. Probably, my anarchist stance is not
+  steady enough, but I do oppose every compromise in favor of
+  "interests of state" or "state security". I want something (state,
+  for example) to protect me from murder and robbery; I will take care
+  of rest.
+
+* Vegetarianism. Current state of ethics consider the life of ultimate
+  value, and I can't agree more. Well, life of human being, but can
+  you prove that life of *any* human being is more valuable then life
+  of, let's say, a cow?... As such, I do not permit meat in my home.
+
+* Minimalism. I dislike photos, toys, souvenirs, pictures and other. I
+  dislike bloated software.
+
+..
+   Presence elsewhere
+   ==================

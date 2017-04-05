@@ -1,0 +1,180 @@
+<!DOCTYPE html><head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="This is an awesome blog">
+        <meta name="viewport" content="width=device-width">
+        <title>Projects &mdash; sinsekvu</title>
+            <link rel="stylesheet" href="../_static/normalize.css" type="text/css">
+            <link rel="stylesheet" href="../_static/sphinx.css" type="text/css">
+            <link rel="stylesheet" href="../_static/main.css" type="text/css">
+            <link rel="stylesheet" href="../_static/modern5.css" type="text/css">
+            <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+            <link rel="stylesheet" href="../_static/font-awesome.min.css" type="text/css">
+        <link rel="shortcut icon" href="../_static/tinkerer.ico" /><!-- Load modernizr and JQuery -->
+	<script src="../_static/jquery.js"></script>
+        <script src="../_static/plugins.js"></script>
+        <script src="../_static/main.js"></script>
+        <link rel="search" title="Search" href="../search.html" /><link rel="alternate" type="application/rss+xml" title="RSS" href="../rss.html" /><script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script><script type="text/javascript" src="../_static/underscore.js"></script><script type="text/javascript" src="../_static/doctools.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Adjusts document height if sidebar is taller
+            var documentwrapper = document.getElementsByTagName("article")[0];
+            var sidebar = document.getElementsByClassName("sidebar")[0];
+
+            if (sidebar.offsetHeight > documentwrapper.offsetHeight)
+            {
+                var mainwrapper = document.getElementsByClassName("main")[0];
+                documentwrapper.style.minHeight = mainwrapper.offsetHeight + "px";
+            }
+
+            // Scroll to content if on small screen
+            if (screen.width < 480)
+            {
+                $(document).scrollTop(document.getElementsByTagName("article")[0].offsetTop - 44);
+            }
+        });
+    </script></head>
+    <body role="document">
+
+      <div id="container"><header role="banner">
+            <hgroup>
+              <h1><a href="../index.html">sinsekvu</a></h1><h2>Choose values, actions follow</h2></hgroup>
+          </header>
+      <nav role="navigation">
+            <ul><li class="quicklink"><div class="rss">
+        <a href="../rss.html" title="Subscribe via RSS"><span class="fa fa-lg fa-rss"></span></a>
+    </div></li><li class="main-nav">
+                  <a href="../index.html">Home</a>
+                </li>
+              <li class="main-nav">
+                  <a href="contact.html">Contact</a>
+                </li>
+              <li class="main-nav">
+                  <a href="#">Projects</a>
+                </li>
+              <li class="main-nav">
+                  <a href="about.html">About me</a>
+                </li>
+              </ul>
+          </nav><div class="main-container" role="main"><div class="main wrapper body clearfix"><article role="article">
+    <div class="section" id="projects">
+<h1><a class="toc-backref" href="#id4">Projects</a></h1>
+<p>Here is incomplete lists of software I developed or contributed to.</p>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#projects" id="id4">Projects</a><ul>
+<li><a class="reference internal" href="#cdist" id="id5">Cdist</a></li>
+<li><a class="reference internal" href="#runit" id="id6">Runit</a></li>
+<li><a class="reference internal" href="#other-debian-packages" id="id7">Other Debian packages</a></li>
+<li><a class="reference internal" href="#undocumented" id="id8">Undocumented</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="cdist">
+<h2><a class="toc-backref" href="#id5">Cdist</a></h2>
+<p><a class="reference external" href="http://www.nico.schottelius.org/software/cdist/">Cdist</a> is
+configuration management system. It allows me to write simple shell
+code, describing what system configuration I want some ssh-accessible
+system to have, and &#8212; magic &#8212; cdist makes it happen.</p>
+<p>I maintain Debian packaging of Cdist,</p>
+<div class="code sh highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">anonscm</span><span class="o">.</span><span class="n">debian</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">cgit</span><span class="o">/</span><span class="n">users</span><span class="o">/</span><span class="n">kaction</span><span class="o">-</span><span class="n">guest</span><span class="o">/</span><span class="n">cdist</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>configuration of my computers</p>
+<div class="code sh highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">anonscm</span><span class="o">.</span><span class="n">debian</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">cgit</span><span class="o">/</span><span class="n">users</span><span class="o">/</span><span class="n">kaction</span><span class="o">-</span><span class="n">guest</span><span class="o">/</span><span class="n">cdist</span><span class="o">-</span><span class="n">cfg</span><span class="o">-</span><span class="n">v2</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>and ocassionally contribute minor fixes back into upstream <a class="footnote-reference" href="#id3" id="id2">[1]</a></p>
+<div class="code highlight-none"><div class="highlight"><pre><span></span>6d277ef1 New type: __dot_file
+c4c2d45e New type: __hosts
+1875bce5 Add support for guixsd into os explorer
+b1152464 Include relicense agreements
+ffc3451c GPLv3+ relicensing: Ricardo Catalinas
+88ec06d0 new type: __hosts
+7d6990d9 By default, package is not autoremoved, if it either suggested or recommened, but not is dependency for some other.  With this change, either package is dependency of manually installed, either is is subject to autoremove.
+10735ffb Description: Fix spelling in manuals
+</pre></div>
+</div>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>Yes, I am ashamed of my spelling. But there is no way to change history.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="runit">
+<h2><a class="toc-backref" href="#id6">Runit</a></h2>
+<div class="code highlight-none"><div class="highlight"><pre><span></span>runit is a collection of tools to provide system-wide service
+supervision and to manage services.  Contrary to sysv init, it not
+only cares about starting and stopping services, but also
+supervises the service daemons while they are running.  Amongst
+other things, it provides a reliable interface to send signals to
+service daemons without the need for pid-files, and a log facility
+with automatic log file rotation and disk space limits.
+</pre></div>
+</div>
+<p>I took over <em>runit</em> Debian package since version <em>2.1.2-4</em> from
+upstream developer, Gerrit Pape. On path to <em>runit_2.1.2-9</em>, which is
+now drop-in replacement for sysvinit, there were</p>
+<ul class="simple">
+<li>developed two auxiliary debhelpers &#8212; <em>dh-runit</em> and <em>dh-sysuser</em>,
+to make integration with <em>runit</em> as painless, as possible</li>
+<li>made huge mistake, which made transition from <em>2.1.2-6</em> to 2.1.2-7*
+require manual tweaking of dpkg files. I am sorry.</li>
+<li>made a lot of lesser errors, bad design solutions and so on.</li>
+</ul>
+<p>There is still a lot to do, but after release of Debian 9, I plan to
+finally push <em>runit</em> into <span class="docutils literal"><span class="pre">Pre-Depends</span></span> of <em>init</em> binary package,
+make it first-class Debian boot system.</p>
+<p>I consider this work my most significant project. My contribution to a
+war aganist systemd. I feel sorry that systemd is Free Software. It
+feels a bit like a civil war.</p>
+</div>
+<div class="section" id="other-debian-packages">
+<h2><a class="toc-backref" href="#id7">Other Debian packages</a></h2>
+<p>This <a class="reference external" href="http://qa.debian.org/developer.php?login=KAction&#64;gnu.org">QA page</a> will give
+an overview of packages I maintain, but do ignore haskell packages &#8212;
+I am still listed as uploader, but I am not active on Debian Haskell
+Group for at least year.</p>
+</div>
+<div class="section" id="undocumented">
+<h2><a class="toc-backref" href="#id8">Undocumented</a></h2>
+<p>List of all my repositories can be viewed on <a class="reference external" href="https://anonscm.debian.org/cgit/users/kaction-guest">Alioth</a>.  Some of them
+are referenced in my other blog posts, others... well, feel free to
+clone and hack around.</p>
+</div>
+</div>
+
+    <div class="postmeta">
+        
+        
+        
+        </div>
+    </article><aside class="sidebar"><section><div class="widget">
+    <h1>Recent Posts</h1>
+    <ul><li>
+            <a href="../2017/04/03/speeding_up_apt_file.html">Speeding up apt-file</a>
+        </li><li>
+            <a href="../2016/01/14/on_suckless_software.html">On suckless software</a>
+        </li><li>
+            <a href="../2016/06/22/text_editor_as_filter.html">$EDITOR as unix filter</a>
+        </li></ul>
+</div>
+</section></aside></div> <!-- #main --></div> <!-- #main-container -->
+
+        <div class="footer-container" role="contentinfo"><footer class="wrapper">&copy; Copyright 2017, Dmitry Bogatov. Powered by <a href="http://www.tinkerer.me/">Tinkerer</a> and <a href="http://sphinx.pocoo.org/">Sphinx</a>.</footer></div> <!-- footer-container -->
+
+      </div> <!--! end of #container --></body>
+</html>
